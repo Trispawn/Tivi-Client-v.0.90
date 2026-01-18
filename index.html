@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VideoShorts - Sin Auto-skip</title>
+    <title>VideoShorts - Scroll Vertical</title>
     <style>
         * {
             margin: 0;
@@ -20,128 +20,116 @@
             cursor: pointer;
         }
         
-        .container {
-            max-width: 100%;
+        /* CONTENEDOR PRINCIPAL CON SCROLL VERTICAL */
+        .videos-scroll-container {
             height: 100vh;
-            position: relative;
+            width: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
         }
         
-        .video-container {
-            position: relative;
+        /* OCULTAR SCROLLBAR */
+        .videos-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .videos-scroll-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* CADA VIDEO OCUPA UNA PANTALLA */
+        .video-screen {
+            height: 100vh;
             width: 100%;
-            height: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
         }
         
-        .video-fullhd {
+        /* VIDEO EN CALIDAD ORIGINAL */
+        .video-element {
             width: 100%;
             height: 100%;
             object-fit: contain;
             background: #000;
         }
         
-        .video-vertical {
-            width: auto;
-            height: 100%;
-            max-width: 100%;
-        }
-        
-        .video-horizontal {
-            width: 100%;
-            height: auto;
-            max-height: 100%;
-        }
-        
-        .controls {
+        /* INFO DEL VIDEO */
+        .video-info {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
             padding: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            z-index: 2;
         }
         
-        .title {
+        .video-title {
             font-size: 18px;
             font-weight: bold;
+            margin-bottom: 8px;
         }
         
-        .author {
+        .video-author {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 14px;
         }
         
-        .avatar {
-            width: 30px;
-            height: 30px;
+        .author-avatar {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             background: #555;
         }
         
-        .actions {
+        /* ACCIONES (like, comentar, compartir) */
+        .video-actions {
             position: absolute;
             right: 20px;
-            bottom: 100px;
+            bottom: 120px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
+            z-index: 2;
         }
         
         .action-btn {
             background: none;
             border: none;
             color: white;
-            font-size: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
             cursor: pointer;
-            text-align: center;
+            font-size: 24px;
         }
         
         .action-count {
             font-size: 12px;
         }
         
-        .end-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            padding: 20px 30px;
-            border-radius: 15px;
-            text-align: center;
-            display: none;
+        /* INDICADOR DE PROGRESO */
+        .progress-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
             z-index: 10;
-            width: 80%;
-            max-width: 300px;
         }
         
-        .end-screen.show {
-            display: block;
-        }
-        
-        .end-btn {
-            background: #ff0050;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin: 10px 5px 0;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .end-btn.secondary {
-            background: #444;
-        }
-        
+        /* PANTALLA DE INICIO */
         .start-screen {
             position: fixed;
             top: 0;
@@ -168,60 +156,20 @@
             margin-top: 20px;
         }
         
-        .counter {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            z-index: 5;
-        }
-        
-        .debug-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            color: #0f0;
-            z-index: 5;
-            display: none;
-        }
-        
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,0,0,0.3);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid red;
-            display: none;
-            z-index: 10;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
+        /* PANEL DE CONFIGURACIÓN */
         .config-panel {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            padding: 20px;
-            border-radius: 10px;
+            background: rgba(0,0,0,0.95);
+            padding: 25px;
+            border-radius: 15px;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             display: none;
-            z-index: 100;
+            z-index: 200;
+            border: 1px solid #444;
         }
         
         .config-panel.show {
@@ -230,12 +178,12 @@
         
         .config-input {
             width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: #333;
+            padding: 12px;
+            margin: 10px 0;
+            background: #222;
             border: 1px solid #555;
             color: white;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 14px;
         }
         
@@ -243,161 +191,233 @@
             background: #00aaff;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
             width: 100%;
-            font-size: 14px;
+            font-size: 15px;
         }
         
+        /* BADGE DE CALIDAD */
         .quality-badge {
             position: absolute;
-            top: 60px;
+            top: 20px;
             left: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 3px 8px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
             border-radius: 10px;
-            font-size: 10px;
+            font-size: 11px;
             color: #0f0;
-            z-index: 5;
+            z-index: 2;
         }
         
-        .nav-buttons {
+        /* INDICADOR DE VIDEO ACTUAL */
+        .current-indicator {
             position: absolute;
-            bottom: 120px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 5;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            z-index: 2;
         }
         
-        .nav-btn {
-            background: rgba(255,255,255,0.2);
+        /* PANTALLA DE FIN (cuando termina el video) */
+        .end-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 3;
+            display: none;
+        }
+        
+        .end-overlay.show {
+            display: flex;
+        }
+        
+        .end-options {
+            background: rgba(30,30,30,0.9);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 250px;
+        }
+        
+        .end-btn {
+            background: #ff0050;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
+            margin: 8px 5px;
             font-size: 14px;
+            min-width: 100px;
         }
         
+        .end-btn.secondary {
+            background: #444;
+        }
+        
+        /* LOOP BADGE */
         .loop-badge {
             position: absolute;
-            top: 60px;
-            right: 20px;
-            background: rgba(0,100,255,0.5);
-            padding: 3px 8px;
-            border-radius: 10px;
+            top: 50px;
+            left: 20px;
+            background: rgba(0,100,255,0.6);
+            padding: 4px 8px;
+            border-radius: 8px;
             font-size: 10px;
             color: white;
-            z-index: 5;
+            z-index: 2;
+            display: none;
+        }
+        
+        .loop-badge.active {
+            display: block;
+        }
+        
+        /* INDICADOR DE SCROLL */
+        .scroll-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 10;
+            animation: bounce 2s infinite;
+            display: none;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        /* NOTIFICACIONES */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            border-radius: 12px;
+            z-index: 1000;
+            animation: fadeInOut 2s;
+            display: none;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
     </style>
 </head>
 <body>
-    <!-- Pantalla de inicio -->
+    <!-- PANTALLA DE INICIO -->
     <div class="start-screen" id="startScreen">
-        <h1>🎬 VideoShorts</h1>
-        <p>Reproduce videos 1920×1080</p>
-        <p style="font-size: 14px; opacity: 0.8; margin-top: 10px;">NO pasa automáticamente al siguiente</p>
+        <h1 style="font-size: 32px; margin-bottom: 10px;">🎬 VideoShorts</h1>
+        <p style="font-size: 16px; opacity: 0.8;">Desplázate hacia arriba/abajo para cambiar de video</p>
         <button class="start-btn" id="startBtn">▶️ COMENZAR</button>
         
-        <!-- Panel de configuración -->
-        <div class="config-panel" id="configPanel">
-            <h3>📁 Configurar Tus Videos</h3>
-            <p style="font-size: 13px; margin-bottom: 15px;">Pega URLs de videos 1920×1080 (máx 3):</p>
-            
-            <div id="videoInputs">
-                <!-- Se generan dinámicamente -->
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <button class="config-btn" onclick="saveVideoUrls()">💾 Guardar y Cerrar</button>
-                <button class="config-btn" onclick="useDemoVideos()" style="background: #555; margin-top: 8px;">🎬 Usar Videos Demo</button>
-                <button class="config-btn" onclick="hideConfigPanel()" style="background: #777; margin-top: 8px;">❌ Cancelar</button>
-            </div>
+        <div style="margin-top: 30px;">
+            <button class="config-btn" onclick="showConfigPanel()" style="background: #333; width: auto; padding: 10px 20px;">
+                ⚙️ Configurar Tus Videos
+            </button>
         </div>
         
-        <div style="margin-top: 30px;">
-            <button class="config-btn" onclick="showConfigPanel()" style="background: #333; width: auto;">⚙️ Configurar Videos</button>
+        <div class="scroll-hint" id="scrollHint">
+            ⬆️ Desplázate para cambiar de video ⬇️
         </div>
     </div>
     
-    <!-- Contenedor principal -->
-    <div class="container" id="mainContainer" style="display: none;">
-        <div class="counter" id="counter">Video 1/0</div>
-        <div class="debug-info" id="debugInfo"></div>
-        <div class="quality-badge" id="qualityBadge">HD</div>
-        <div class="loop-badge" id="loopBadge">LOOP: OFF</div>
+    <!-- PANEL DE CONFIGURACIÓN -->
+    <div class="config-panel" id="configPanel">
+        <h2 style="margin-bottom: 20px;">📁 Tus Videos</h2>
+        <p style="font-size: 14px; margin-bottom: 15px; color: #aaa;">
+            Pega las URLs de tus videos 1920×1080 desde GitHub
+        </p>
         
-        <!-- Videos se cargan aquí -->
-        <div id="videosContainer"></div>
-        
-        <!-- Pantalla de fin de video -->
-        <div class="end-screen" id="endScreen">
-            <h3>🎬 Video Terminado</h3>
-            <p style="margin: 15px 0; font-size: 14px;">¿Qué quieres hacer?</p>
-            <div>
-                <button class="end-btn" onclick="replayVideo()">🔄 Repetir</button>
-                <button class="end-btn secondary" onclick="nextVideo()">⏭️ Siguiente</button>
-                <button class="end-btn secondary" onclick="prevVideo()">⏮️ Anterior</button>
-            </div>
-            <div style="margin-top: 15px;">
-                <button class="end-btn secondary" onclick="toggleLoop()" id="toggleLoopBtn">🔄 Loop: OFF</button>
-            </div>
+        <div id="videoInputs">
+            <!-- Inputs se generan dinámicamente -->
         </div>
         
-        <div class="error-message" id="errorMessage">
-            <h3>❌ Error cargando video</h3>
-            <p id="errorText">No se pudo cargar el video</p>
-            <button class="end-btn" onclick="nextVideo()" style="margin-top: 15px;">Saltar este video</button>
+        <div style="margin-top: 25px;">
+            <button class="config-btn" onclick="saveVideoUrls()">
+                💾 Guardar y Cerrar
+            </button>
+            <button class="config-btn" onclick="useDemoVideos()" style="background: #555; margin-top: 10px;">
+                🎬 Usar Videos de Ejemplo
+            </button>
+            <button class="config-btn" onclick="hideConfigPanel()" style="background: #777; margin-top: 10px;">
+                ❌ Cancelar
+            </button>
         </div>
         
-        <!-- Botones de navegación -->
-        <div class="nav-buttons">
-            <button class="nav-btn" onclick="prevVideo()">⏮️ Anterior</button>
-            <button class="nav-btn" onclick="nextVideo()">⏭️ Siguiente</button>
+        <div style="margin-top: 20px; font-size: 12px; color: #888;">
+            <p>📌 Formato: https://raw.githubusercontent.com/usuario/repo/main/video.mp4</p>
+            <p>📌 Máximo: 5 videos</p>
         </div>
     </div>
+    
+    <!-- CONTENEDOR PRINCIPAL CON SCROLL -->
+    <div class="videos-scroll-container" id="videosContainer" style="display: none;">
+        <!-- Videos se cargan aquí dinámicamente -->
+    </div>
+    
+    <!-- NOTIFICACIONES -->
+    <div class="notification" id="notification"></div>
 
     <script>
         // ============================================
-        // CONFIGURACIÓN
+        // VARIABLES GLOBALES
         // ============================================
         let videos = [];
         let currentVideoIndex = 0;
         let userStarted = false;
         let loopEnabled = false;
+        let isScrolling = false;
+        let scrollTimeout = null;
 
-        // Elementos del DOM
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
         const startScreen = document.getElementById('startScreen');
-        const mainContainer = document.getElementById('mainContainer');
         const startBtn = document.getElementById('startBtn');
         const videosContainer = document.getElementById('videosContainer');
-        const counter = document.getElementById('counter');
-        const debugInfo = document.getElementById('debugInfo');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
         const configPanel = document.getElementById('configPanel');
         const videoInputs = document.getElementById('videoInputs');
-        const qualityBadge = document.getElementById('qualityBadge');
-        const endScreen = document.getElementById('endScreen');
-        const loopBadge = document.getElementById('loopBadge');
-        const toggleLoopBtn = document.getElementById('toggleLoopBtn');
+        const scrollHint = document.getElementById('scrollHint');
+        const notification = document.getElementById('notification');
 
         // ============================================
         // INICIALIZACIÓN
         // ============================================
         function initApp() {
-            console.log("Iniciando VideoShorts...");
+            console.log("🎬 Iniciando VideoShorts con scroll vertical...");
             
-            // Cargar configuraciones guardadas
+            // Cargar videos guardados
             loadSavedVideos();
             
-            // Si no hay videos, usar demo
+            // Si no hay videos, mostrar panel de configuración
             if (videos.length === 0) {
-                useDemoVideos();
+                setTimeout(() => showConfigPanel(), 500);
             }
             
             // Eventos
@@ -409,6 +429,11 @@
                     startVideos();
                 }
             });
+            
+            // Mostrar hint de scroll después de 3 segundos
+            setTimeout(() => {
+                scrollHint.style.display = 'block';
+            }, 3000);
         }
 
         // ============================================
@@ -419,7 +444,7 @@
             if (savedVideos) {
                 try {
                     videos = JSON.parse(savedVideos);
-                    console.log(`Cargados ${videos.length} videos`);
+                    console.log(`📂 Cargados ${videos.length} videos guardados`);
                 } catch (e) {
                     console.error("Error cargando videos:", e);
                     videos = [];
@@ -441,7 +466,10 @@
                         id: index + 1,
                         title: `Mi Video ${index + 1}`,
                         author: "Yo",
-                        videoUrl: url
+                        videoUrl: url,
+                        likes: 0,
+                        comments: 0,
+                        shares: 0
                     });
                 }
             });
@@ -449,21 +477,20 @@
             if (newVideos.length > 0) {
                 videos = newVideos;
                 localStorage.setItem('videoShortsUrls', JSON.stringify(videos));
-                alert(`✅ ${newVideos.length} videos guardados`);
+                showNotification(`✅ ${newVideos.length} videos guardados`);
                 hideConfigPanel();
                 
                 // Si la app ya está iniciada, recargar
                 if (userStarted) {
-                    currentVideoIndex = 0;
-                    loadVideo(currentVideoIndex);
+                    renderAllVideos();
                 }
             } else {
-                alert("❌ Ingresa al menos una URL");
+                showNotification("❌ Ingresa al menos una URL de video");
             }
         }
 
         // ============================================
-        // USAR VIDEOS DE DEMO
+        // USAR VIDEOS DE EJEMPLO
         // ============================================
         function useDemoVideos() {
             videos = [
@@ -471,29 +498,38 @@
                     id: 1,
                     title: "Aurora Boreal - 1080p",
                     author: "Nature 4K",
-                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                    likes: 0,
+                    comments: 0,
+                    shares: 0
                 },
                 {
                     id: 2,
                     title: "Skateboarding - Full HD",
                     author: "Extreme Sports",
-                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                    likes: 0,
+                    comments: 0,
+                    shares: 0
                 },
                 {
                     id: 3,
                     title: "Drone Flight - 1080p",
                     author: "Aerial Views",
-                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                    likes: 0,
+                    comments: 0,
+                    shares: 0
                 }
             ];
             
             localStorage.setItem('videoShortsUrls', JSON.stringify(videos));
-            console.log("Videos demo cargados");
+            console.log("📂 Videos de ejemplo cargados");
+            showNotification("🎬 Videos de ejemplo cargados");
             hideConfigPanel();
             
             if (userStarted) {
-                currentVideoIndex = 0;
-                loadVideo(currentVideoIndex);
+                renderAllVideos();
             }
         }
 
@@ -503,13 +539,15 @@
         function showConfigPanel() {
             videoInputs.innerHTML = '';
             
+            // Crear 3 inputs para videos
             for (let i = 0; i < 3; i++) {
                 const video = videos[i] || { videoUrl: '' };
                 videoInputs.innerHTML += `
                     <input type="text" 
                            class="video-input config-input" 
-                           placeholder="URL Video ${i + 1} (1920×1080)"
-                           value="${video.videoUrl}">
+                           placeholder="URL del Video ${i + 1} (1920×1080)"
+                           value="${video.videoUrl}"
+                           style="margin-bottom: 12px;">
                 `;
             }
             
@@ -521,151 +559,138 @@
         }
 
         // ============================================
-        // INICIAR REPRODUCCIÓN
+        // INICIAR LA APLICACIÓN
         // ============================================
         function startVideos() {
             if (userStarted) return;
             
             if (videos.length === 0) {
-                alert("⚠️ Configura videos primero");
+                showNotification("⚠️ Configura tus videos primero");
                 showConfigPanel();
                 return;
             }
             
             userStarted = true;
-            console.log(`Comenzando con ${videos.length} videos`);
+            console.log(`▶️ Comenzando con ${videos.length} videos`);
             
+            // Ocultar pantalla de inicio
             startScreen.style.opacity = '0';
             setTimeout(() => {
                 startScreen.style.display = 'none';
-                mainContainer.style.display = 'block';
-                loadVideo(currentVideoIndex);
+                videosContainer.style.display = 'block';
+                
+                // Renderizar todos los videos
+                renderAllVideos();
+                
+                // Ir al primer video
+                setTimeout(() => {
+                    videosContainer.scrollTo(0, 0);
+                    playCurrentVideo();
+                }, 100);
+                
             }, 500);
         }
 
         // ============================================
-        // CARGAR VIDEO
+        // RENDERIZAR TODOS LOS VIDEOS
         // ============================================
-        function loadVideo(index) {
-            if (index < 0 || index >= videos.length) return;
-            
-            // Ocultar pantallas
-            endScreen.classList.remove('show');
-            errorMessage.classList.remove('show');
-            
-            // Limpiar contenedor
+        function renderAllVideos() {
             videosContainer.innerHTML = '';
             
-            const video = videos[index];
-            
-            // Actualizar contador
-            counter.textContent = `Video ${index + 1}/${videos.length}`;
-            
-            // Crear video
-            const videoContainer = document.createElement('div');
-            videoContainer.className = 'video-container';
-            
-            const videoElement = document.createElement('video');
-            videoElement.id = 'currentVideo';
-            videoElement.className = 'video-fullhd';
-            videoElement.playsInline = true;
-            videoElement.loop = loopEnabled; // Configurar loop
-            
-            const source = document.createElement('source');
-            source.src = video.videoUrl;
-            source.type = 'video/mp4';
-            videoElement.appendChild(source);
-            
-            // Controles
-            const controlsHTML = `
-                <div class="controls">
-                    <div class="title">${video.title}</div>
-                    <div class="author">
-                        <div class="avatar"></div>
-                        <span>${video.author}</span>
+            videos.forEach((video, index) => {
+                const videoScreen = document.createElement('div');
+                videoScreen.className = 'video-screen';
+                videoScreen.id = `video-${index}`;
+                videoScreen.dataset.index = index;
+                
+                videoScreen.innerHTML = `
+                    <div class="quality-badge" id="quality-${index}">🎬 1080p</div>
+                    <div class="loop-badge" id="loop-${index}">🔁 LOOP</div>
+                    <div class="current-indicator" id="indicator-${index}">${index + 1}/${videos.length}</div>
+                    
+                    <video class="video-element" 
+                           id="video-element-${index}"
+                           playsinline
+                           preload="auto"
+                           ${loopEnabled ? 'loop' : ''}>
+                        <source src="${video.videoUrl}" type="video/mp4">
+                        Tu navegador no soporta el video.
+                    </video>
+                    
+                    <div class="end-overlay" id="end-overlay-${index}">
+                        <div class="end-options">
+                            <h3 style="margin-bottom: 15px;">🎬 Video Terminado</h3>
+                            <button class="end-btn" onclick="replayVideo(${index})">🔄 Repetir</button>
+                            <button class="end-btn secondary" onclick="nextVideoByIndex(${index})">⏭️ Siguiente</button>
+                            <div style="margin-top: 15px;">
+                                <button class="end-btn secondary" onclick="toggleLoopForVideo(${index})" 
+                                        id="loop-btn-${index}">🔄 Loop: OFF</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="actions">
-                    <button class="action-btn" onclick="likeVideo(${index})">❤️<br><span class="action-count" id="likeCount${index}">0</span></button>
-                    <button class="action-btn" onclick="commentVideo()">💬<br><span class="action-count">0</span></button>
-                    <button class="action-btn" onclick="shareVideo()">↪️<br><span class="action-count">0</span></button>
-                </div>
-            `;
-            
-            videoContainer.appendChild(videoElement);
-            videoContainer.innerHTML += controlsHTML;
-            videosContainer.appendChild(videoContainer);
-            
-            // Configurar eventos
-            setupVideoEvents(videoElement, index);
-            
-            // Reproducir
-            playVideo(videoElement, index);
-        }
-
-        // ============================================
-        // REPRODUCIR VIDEO
-        // ============================================
-        function playVideo(videoElement, index, retryCount = 0) {
-            const maxRetries = 2;
-            
-            videoElement.play().then(() => {
-                console.log(`✅ Video ${index + 1} reproduciéndose`);
-                qualityBadge.textContent = '🎬 1080p';
-                
-                // Detectar dimensiones
-                videoElement.addEventListener('loadedmetadata', () => {
-                    const width = videoElement.videoWidth;
-                    const height = videoElement.videoHeight;
                     
-                    debugInfo.style.display = 'block';
-                    debugInfo.textContent = `${width}×${height}`;
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-author">
+                            <div class="author-avatar"></div>
+                            <span>${video.author}</span>
+                        </div>
+                    </div>
                     
-                    if (width > height) {
-                        videoElement.classList.add('video-horizontal');
-                        qualityBadge.textContent = '🎬 1080p (Horizontal)';
-                    } else {
-                        videoElement.classList.add('video-vertical');
-                        qualityBadge.textContent = '🎬 1080p (Vertical)';
-                    }
-                });
+                    <div class="video-actions">
+                        <button class="action-btn" onclick="likeVideo(${index})">
+                            ❤️<br><span class="action-count" id="like-count-${index}">${video.likes}</span>
+                        </button>
+                        <button class="action-btn" onclick="commentVideo(${index})">
+                            💬<br><span class="action-count" id="comment-count-${index}">${video.comments}</span>
+                        </button>
+                        <button class="action-btn" onclick="shareVideo(${index})">
+                            ↪️<br><span class="action-count" id="share-count-${index}">${video.shares}</span>
+                        </button>
+                    </div>
+                `;
                 
-            }).catch(error => {
-                console.error(`❌ Error:`, error);
+                videosContainer.appendChild(videoScreen);
                 
-                if (retryCount < maxRetries) {
-                    setTimeout(() => {
-                        playVideo(videoElement, index, retryCount + 1);
-                    }, 1000);
-                } else {
-                    errorText.textContent = `Error cargando: ${videos[index].title}`;
-                    errorMessage.classList.add('show');
-                }
+                // Configurar eventos para este video
+                setupVideoEvents(index);
             });
+            
+            // Configurar evento de scroll
+            setupScrollEvents();
+            
+            // Actualizar indicador del primer video
+            updateVideoIndicator(0);
         }
 
         // ============================================
-        // CONFIGURAR EVENTOS DEL VIDEO
+        // CONFIGURAR EVENTOS PARA UN VIDEO
         // ============================================
-        function setupVideoEvents(videoElement, index) {
-            // Cuando termina el video
+        function setupVideoEvents(index) {
+            const videoElement = document.getElementById(`video-element-${index}`);
+            const endOverlay = document.getElementById(`end-overlay-${index}`);
+            
+            if (!videoElement) return;
+            
+            // Cuando el video termina
             videoElement.addEventListener('ended', () => {
                 console.log(`📼 Video ${index + 1} terminado`);
                 
                 if (!loopEnabled) {
-                    // Mostrar pantalla de fin (NO pasa automáticamente)
-                    showEndScreen();
+                    // Mostrar overlay de fin
+                    endOverlay.classList.add('show');
                 } else {
-                    // Si loop está activado, reinicia automáticamente
-                    videoElement.currentTime = 0;
-                    videoElement.play();
+                    // Si loop está activado, reiniciar
+                    setTimeout(() => {
+                        videoElement.currentTime = 0;
+                        videoElement.play();
+                    }, 500);
                 }
             });
             
-            // Clic para pausar/reproducir
+            // Clic en el video para pausar/reproducir
             videoElement.addEventListener('click', (e) => {
-                e.preventDefault();
+                e.stopPropagation();
                 if (videoElement.paused) {
                     videoElement.play();
                 } else {
@@ -673,113 +698,226 @@
                 }
             });
             
-            // Error
-            videoElement.addEventListener('error', () => {
-                errorText.textContent = `Error técnico en video`;
-                errorMessage.classList.add('show');
+            // Error de carga
+            videoElement.addEventListener('error', (e) => {
+                console.error(`❌ Error en video ${index + 1}:`, e);
+                showNotification(`Error cargando video ${index + 1}`);
+            });
+            
+            // Cuando se cargan los metadatos
+            videoElement.addEventListener('loadedmetadata', () => {
+                const width = videoElement.videoWidth;
+                const height = videoElement.videoHeight;
+                const qualityBadge = document.getElementById(`quality-${index}`);
+                
+                if (qualityBadge) {
+                    if (width > height) {
+                        qualityBadge.textContent = `🎬 ${width}×${height} (Horizontal)`;
+                    } else {
+                        qualityBadge.textContent = `🎬 ${width}×${height} (Vertical)`;
+                    }
+                }
             });
         }
 
         // ============================================
-        // PANTALLA DE FIN DE VIDEO
+        // CONFIGURAR EVENTOS DE SCROLL
         // ============================================
-        function showEndScreen() {
-            endScreen.classList.add('show');
-        }
-
-        function hideEndScreen() {
-            endScreen.classList.remove('show');
+        function setupScrollEvents() {
+            let scrollTimeout;
+            
+            videosContainer.addEventListener('scroll', () => {
+                if (isScrolling) return;
+                
+                isScrolling = true;
+                
+                // Calcular qué video está visible
+                const scrollPosition = videosContainer.scrollTop;
+                const screenHeight = window.innerHeight;
+                const newIndex = Math.round(scrollPosition / screenHeight);
+                
+                // Verificar si cambió de video
+                if (newIndex !== currentVideoIndex && newIndex >= 0 && newIndex < videos.length) {
+                    // Pausar video anterior
+                    const prevVideoElement = document.getElementById(`video-element-${currentVideoIndex}`);
+                    if (prevVideoElement) {
+                        prevVideoElement.pause();
+                        // Ocultar overlay de fin si está visible
+                        const prevEndOverlay = document.getElementById(`end-overlay-${currentVideoIndex}`);
+                        if (prevEndOverlay) {
+                            prevEndOverlay.classList.remove('show');
+                        }
+                    }
+                    
+                    // Actualizar índice
+                    currentVideoIndex = newIndex;
+                    
+                    // Reproducir nuevo video
+                    playCurrentVideo();
+                    
+                    // Actualizar indicador
+                    updateVideoIndicator(currentVideoIndex);
+                    
+                    // Mostrar notificación del video actual
+                    showNotification(`Video ${currentVideoIndex + 1}/${videos.length}: ${videos[currentVideoIndex].title}`);
+                }
+                
+                // Permitir nuevo scroll después de un breve tiempo
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 300);
+            });
         }
 
         // ============================================
-        // CONTROL DE VIDEOS
+        // REPRODUCIR VIDEO ACTUAL
         // ============================================
-        function nextVideo() {
-            hideEndScreen();
-            currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-            loadVideo(currentVideoIndex);
+        function playCurrentVideo() {
+            const videoElement = document.getElementById(`video-element-${currentVideoIndex}`);
+            if (!videoElement) return;
+            
+            // Ocultar overlay de fin si está visible
+            const endOverlay = document.getElementById(`end-overlay-${currentVideoIndex}`);
+            if (endOverlay) {
+                endOverlay.classList.remove('show');
+            }
+            
+            // Reproducir
+            videoElement.play().catch(error => {
+                console.log("Error al reproducir:", error);
+                // Si falla, intentar con click simulado
+                setTimeout(() => {
+                    videoElement.play().catch(e => {
+                        console.log("Segundo intento fallido:", e);
+                    });
+                }, 500);
+            });
         }
 
-        function prevVideo() {
-            hideEndScreen();
-            currentVideoIndex = currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
-            loadVideo(currentVideoIndex);
+        // ============================================
+        // ACTUALIZAR INDICADOR DE VIDEO
+        // ============================================
+        function updateVideoIndicator(index) {
+            // Actualizar todos los indicadores
+            for (let i = 0; i < videos.length; i++) {
+                const indicator = document.getElementById(`indicator-${i}`);
+                if (indicator) {
+                    indicator.textContent = `${i + 1}/${videos.length}`;
+                    indicator.style.background = i === index ? 'rgba(255,0,80,0.7)' : 'rgba(0,0,0,0.6)';
+                }
+            }
         }
 
-        function replayVideo() {
-            hideEndScreen();
-            const videoElement = document.getElementById('currentVideo');
+        // ============================================
+        // FUNCIONES DE CONTROL
+        // ============================================
+        function replayVideo(index) {
+            const videoElement = document.getElementById(`video-element-${index}`);
+            const endOverlay = document.getElementById(`end-overlay-${index}`);
+            
             if (videoElement) {
                 videoElement.currentTime = 0;
                 videoElement.play();
             }
+            
+            if (endOverlay) {
+                endOverlay.classList.remove('show');
+            }
         }
 
-        function toggleLoop() {
+        function nextVideoByIndex(index) {
+            const nextIndex = (index + 1) % videos.length;
+            
+            // Hacer scroll al siguiente video
+            videosContainer.scrollTo({
+                top: nextIndex * window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function toggleLoopForVideo(index) {
             loopEnabled = !loopEnabled;
             
-            const videoElement = document.getElementById('currentVideo');
-            if (videoElement) {
-                videoElement.loop = loopEnabled;
+            // Actualizar todos los videos
+            for (let i = 0; i < videos.length; i++) {
+                const videoElement = document.getElementById(`video-element-${i}`);
+                const loopBadge = document.getElementById(`loop-${i}`);
+                const loopBtn = document.getElementById(`loop-btn-${i}`);
+                
+                if (videoElement) {
+                    videoElement.loop = loopEnabled;
+                }
+                
+                if (loopBadge) {
+                    if (loopEnabled) {
+                        loopBadge.classList.add('active');
+                    } else {
+                        loopBadge.classList.remove('active');
+                    }
+                }
+                
+                if (loopBtn) {
+                    loopBtn.textContent = loopEnabled ? '🔄 Loop: ON' : '🔄 Loop: OFF';
+                }
             }
             
-            loopBadge.textContent = loopEnabled ? 'LOOP: ON' : 'LOOP: OFF';
-            toggleLoopBtn.textContent = loopEnabled ? '🔄 Loop: ON' : '🔄 Loop: OFF';
-            
-            // Mostrar notificación
-            showNotification(loopEnabled ? '🔁 Loop Activado' : '🔁 Loop Desactivado');
+            showNotification(loopEnabled ? '🔁 Loop activado' : '🔁 Loop desactivado');
         }
 
         // ============================================
         // INTERACCIÓN SOCIAL
         // ============================================
         function likeVideo(index) {
-            const likeCount = document.getElementById(`likeCount${index}`);
-            let count = parseInt(likeCount.textContent) || 0;
-            count++;
-            likeCount.textContent = count;
-            
-            likeCount.style.color = '#ff0050';
-            likeCount.style.fontWeight = 'bold';
-            setTimeout(() => {
-                likeCount.style.color = '';
-                likeCount.style.fontWeight = '';
-            }, 500);
-            
-            showNotification('❤️ Like agregado');
-        }
-
-        function commentVideo() {
-            const comment = prompt("Escribe tu comentario:");
-            if (comment) {
-                showNotification('💬 Comentario guardado');
+            if (videos[index]) {
+                videos[index].likes++;
+                const likeCount = document.getElementById(`like-count-${index}`);
+                if (likeCount) {
+                    likeCount.textContent = videos[index].likes;
+                    likeCount.style.color = '#ff0050';
+                    likeCount.style.fontWeight = 'bold';
+                    setTimeout(() => {
+                        likeCount.style.color = '';
+                        likeCount.style.fontWeight = '';
+                    }, 500);
+                }
+                showNotification('❤️ Like agregado');
             }
         }
 
-        function shareVideo() {
-            showNotification('↪️ Video compartido (simulado)');
+        function commentVideo(index) {
+            const comment = prompt("Escribe tu comentario:");
+            if (comment && videos[index]) {
+                videos[index].comments++;
+                const commentCount = document.getElementById(`comment-count-${index}`);
+                if (commentCount) {
+                    commentCount.textContent = videos[index].comments;
+                }
+                showNotification('💬 Comentario agregado');
+            }
+        }
+
+        function shareVideo(index) {
+            if (videos[index]) {
+                videos[index].shares++;
+                const shareCount = document.getElementById(`share-count-${index}`);
+                if (shareCount) {
+                    shareCount.textContent = videos[index].shares;
+                }
+                showNotification('↪️ Video compartido');
+            }
         }
 
         // ============================================
         // NOTIFICACIONES
         // ============================================
         function showNotification(message) {
-            const notification = document.createElement('div');
             notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(255,255,255,0.15);
-                backdrop-filter: blur(10px);
-                padding: 10px 20px;
-                border-radius: 10px;
-                z-index: 1000;
-                animation: fadeInOut 2s;
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 2000);
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
         }
 
         // ============================================
@@ -789,19 +927,29 @@
             if (!userStarted) return;
             
             switch(e.code) {
-                case 'ArrowRight':
+                case 'ArrowDown':
                     e.preventDefault();
-                    nextVideo();
+                    // Ir al siguiente video
+                    const nextIndex = (currentVideoIndex + 1) % videos.length;
+                    videosContainer.scrollTo({
+                        top: nextIndex * window.innerHeight,
+                        behavior: 'smooth'
+                    });
                     break;
                     
-                case 'ArrowLeft':
+                case 'ArrowUp':
                     e.preventDefault();
-                    prevVideo();
+                    // Ir al video anterior
+                    const prevIndex = currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
+                    videosContainer.scrollTo({
+                        top: prevIndex * window.innerHeight,
+                        behavior: 'smooth'
+                    });
                     break;
                     
                 case 'Space':
                     e.preventDefault();
-                    const videoElement = document.getElementById('currentVideo');
+                    const videoElement = document.getElementById(`video-element-${currentVideoIndex}`);
                     if (videoElement) {
                         if (videoElement.paused) {
                             videoElement.play();
@@ -813,12 +961,12 @@
                     
                 case 'KeyL':
                     e.preventDefault();
-                    toggleLoop();
+                    toggleLoopForVideo(currentVideoIndex);
                     break;
                     
                 case 'KeyR':
                     e.preventDefault();
-                    replayVideo();
+                    replayVideo(currentVideoIndex);
                     break;
                     
                 case 'KeyC':
@@ -834,18 +982,6 @@
         // INICIAR APLICACIÓN
         // ============================================
         document.addEventListener('DOMContentLoaded', initApp);
-
-        // Animación CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-                20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
