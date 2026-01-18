@@ -3,97 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VideoShorts - Con Interacción Requerida</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VideoShorts Simple</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
             height: 100vh;
-            cursor: pointer; /* Indica que es clickeable */
+            overflow: hidden;
         }
         
         .container {
+            max-width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .video-player {
             position: relative;
             height: 100vh;
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            overflow: hidden;
-            background-color: #000;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
-        }
-        
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            max-width: 500px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            z-index: 10;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(45deg, #FF0050, #00F0FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-        
-        .random-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .random-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .videos-container {
-            height: 100vh;
-            overflow-y: auto;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-        }
-        
-        .videos-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .video-card {
-            position: relative;
-            height: 100vh;
-            width: 100%;
-            scroll-snap-align: start;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
         }
         
@@ -103,927 +38,451 @@
             object-fit: cover;
         }
         
-        .video-info {
+        .controls {
             position: absolute;
-            bottom: 80px;
+            bottom: 0;
             left: 0;
             right: 0;
-            padding: 0 20px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-            color: white;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
-        .video-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            line-height: 1.3;
+        .title {
+            font-size: 18px;
+            font-weight: bold;
         }
         
-        .video-author {
+        .author {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .author-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #fff;
-        }
-        
-        .author-name {
-            font-weight: 500;
-            font-size: 16px;
-        }
-        
-        .video-stats {
-            display: flex;
-            gap: 20px;
             font-size: 14px;
-            opacity: 0.9;
         }
         
-        .video-actions {
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #555;
+        }
+        
+        .actions {
             position: absolute;
             right: 20px;
-            bottom: 120px;
+            bottom: 100px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            align-items: center;
+            gap: 20px;
         }
         
         .action-btn {
             background: none;
             border: none;
             color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
+            font-size: 24px;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .action-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        .action-btn i {
-            font-size: 28px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            text-align: center;
         }
         
         .action-count {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
         }
         
-        .like-btn.liked i {
-            color: #FF0050;
-        }
-        
-        .shuffle-notice {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            z-index: 20;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.5s;
-        }
-        
-        .shuffle-notice.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .loader {
+        .next-timer {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #FF0050;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 5;
-        }
-        
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 5;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        
-        .video-overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .overlay-text {
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            max-width: 80%;
-        }
-        
-        .overlay-btn {
-            background: linear-gradient(45deg, #FF0050, #00F0FF);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        .current-video {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            z-index: 5;
-        }
-        
-        .video-error {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background-color: rgba(255, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 0, 0, 0.5);
-            z-index: 6;
-        }
-        
-        .error-btn {
-            background-color: #FF0050;
-            color: white;
-            border: none;
+            background: rgba(0,0,0,0.7);
             padding: 10px 20px;
-            border-radius: 5px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        
-        .next-video-timer {
-            position: absolute;
-            top: 120px;
-            left: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 8px 15px;
             border-radius: 20px;
             font-size: 14px;
-            z-index: 5;
             display: none;
         }
         
-        .next-video-timer.show {
+        .next-timer.show {
             display: block;
-            animation: pulse 1s infinite;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
-        }
-        
-        .skip-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 4;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        
-        .skip-overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .skip-text {
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
+        .skip-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
             cursor: pointer;
         }
         
-        .skip-text:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Pantalla de inicio */
         .start-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000;
+            background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             z-index: 100;
-            transition: opacity 0.5s;
-        }
-        
-        .start-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
         }
         
         .start-btn {
-            background: linear-gradient(45deg, #FF0050, #00F0FF);
+            background: #ff0050;
             color: white;
             border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
+            padding: 15px 30px;
             font-size: 18px;
-            font-weight: 600;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 30px;
-            transition: transform 0.3s;
+            margin-top: 20px;
         }
         
-        .start-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .start-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #FF0050, #00F0FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .start-instruction {
-            font-size: 16px;
-            opacity: 0.8;
-            text-align: center;
-            max-width: 300px;
-            margin-bottom: 30px;
-        }
-        
-        @media (max-width: 500px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .header {
-                max-width: 100%;
-            }
-            
-            .shuffle-notice {
-                max-width: calc(100% - 40px);
-                margin: 0 20px;
-            }
+        .counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <!-- Pantalla de inicio para interacción del usuario -->
+    <!-- Pantalla de inicio -->
     <div class="start-screen" id="startScreen">
-        <div class="start-title">VideoShorts</div>
-        <div class="start-instruction">Toca cualquier lugar para comenzar a ver videos</div>
-        <button class="start-btn" id="startBtn">
-            <i class="fas fa-play"></i> Comenzar
-        </button>
-        <div class="start-instruction" style="margin-top: 20px; font-size: 14px;">
-            Los videos avanzarán automáticamente al terminar
-        </div>
+        <h1>🎬 VideoShorts</h1>
+        <p>Toca el botón para empezar</p>
+        <button class="start-btn" id="startBtn">▶️ COMENZAR</button>
+        <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">Los videos pasarán automáticamente al terminar</p>
     </div>
     
+    <!-- Contenedor principal -->
     <div class="container" id="mainContainer" style="display: none;">
-        <div class="header">
-            <div class="logo">VideoShorts</div>
-            <button class="random-btn" id="shuffleBtn">
-                <i class="fas fa-random"></i> Aleatorio
-            </button>
-        </div>
+        <div class="counter" id="counter">Video 1/3</div>
         
-        <div class="videos-container" id="videosContainer">
-            <!-- Los videos se cargarán aquí dinámicamente -->
-        </div>
+        <!-- Videos se cargan aquí -->
+        <div id="videosContainer"></div>
         
-        <div class="shuffle-notice" id="shuffleNotice">
-            <p>Reproduciendo videos en orden aleatorio</p>
-        </div>
-        
-        <div class="loader" id="loader"></div>
+        <div class="next-timer" id="nextTimer">Siguiente video en 1s...</div>
     </div>
 
     <script>
         // ============================================
-        // CONFIGURACIÓN: REEMPLAZA ESTAS URLs
+        // DATOS DE LOS VIDEOS - USAREMOS VIDEOS QUE SÍ FUNCIONAN
         // ============================================
-        // Cambia estas URLs por las de tus videos e imágenes en GitHub
-        // Formato: https://raw.githubusercontent.com/USUARIO/REPOSITORIO/main/ruta/archivo.mp4
-        // ============================================
-        
-        // Datos de los videos - USA ESTOS VIDEOS DE PRUEBA PRIMERO
-        const videoData = [
+        const videos = [
             {
                 id: 1,
-                title: "Aurora Boreal en Noruega",
-                author: "Nature Wonders",
-                authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
-                likes: "325K",
-                comments: "4.2K",
-                shares: "9.1K",
-                liked: true,
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+                title: "Paisajes Naturales",
+                author: "Nature Channel",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                duration: 15 // segundos
             },
             {
                 id: 2,
-                title: "Skateboarding en Downtown",
-                author: "Urban Sports",
-                authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
-                likes: "287K",
-                comments: "3.8K",
-                shares: "7.4K",
-                liked: false,
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+                title: "Aventura Urbana",
+                author: "City Explorer",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                duration: 15
             },
             {
                 id: 3,
-                title: "Dron sobre la Ciudad",
-                author: "Aerial Views",
-                authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
-                likes: "412K",
-                comments: "5.6K",
-                shares: "14.3K",
-                liked: false,
-                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                title: "Tecnología Futurista",
+                author: "Tech Vision",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                duration: 15
             }
         ];
 
-        // Elementos del DOM
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let currentVideoIndex = 0;
+        let timer = null;
+        let userStarted = false;
+
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
         const startScreen = document.getElementById('startScreen');
         const mainContainer = document.getElementById('mainContainer');
         const startBtn = document.getElementById('startBtn');
         const videosContainer = document.getElementById('videosContainer');
-        const shuffleBtn = document.getElementById('shuffleBtn');
-        const shuffleNotice = document.getElementById('shuffleNotice');
-        const loader = document.getElementById('loader');
+        const nextTimer = document.getElementById('nextTimer');
+        const counter = document.getElementById('counter');
 
-        // Variable para almacenar el orden actual de los videos
-        let currentVideoOrder = [];
-        let currentVideoIndex = 0;
-        let skipTimer = null;
-        let userInteracted = false;
-        let userHasStarted = false;
-
-        // Inicializar la página
-        function initPage() {
-            // Mostrar pantalla de inicio
-            startScreen.style.display = 'flex';
-            mainContainer.style.display = 'none';
+        // ============================================
+        // FUNCIÓN PRINCIPAL - INICIAR TODO
+        // ============================================
+        function initApp() {
+            console.log("App inicializada");
             
-            // Configurar eventos de inicio
-            startBtn.addEventListener('click', startApp);
-            startScreen.addEventListener('click', startApp);
+            // Evento para el botón de inicio
+            startBtn.addEventListener('click', startVideos);
             
-            // También permitir inicio con tecla
+            // También permitir inicio con tecla ESPACIO o ENTER
             document.addEventListener('keydown', (e) => {
-                if (!userHasStarted && (e.code === 'Space' || e.code === 'Enter')) {
-                    startApp();
+                if (!userStarted && (e.code === 'Space' || e.code === 'Enter')) {
+                    startVideos();
                 }
             });
         }
 
-        // Iniciar la aplicación después de interacción del usuario
-        function startApp() {
-            if (userHasStarted) return;
+        // ============================================
+        // COMENZAR LOS VIDEOS (después de interacción del usuario)
+        // ============================================
+        function startVideos() {
+            if (userStarted) return;
             
-            userHasStarted = true;
-            console.log("Usuario interactuó, iniciando aplicación...");
+            userStarted = true;
+            console.log("Usuario hizo click, comenzando videos...");
             
             // Ocultar pantalla de inicio
-            startScreen.classList.add('hidden');
-            
+            startScreen.style.opacity = '0';
             setTimeout(() => {
                 startScreen.style.display = 'none';
                 mainContainer.style.display = 'block';
                 
-                // Inicializar videos
-                initializeVideos();
+                // Cargar el primer video
+                loadVideo(currentVideoIndex);
             }, 500);
         }
 
-        // Inicializar videos después de interacción del usuario
-        function initializeVideos() {
-            console.log("Inicializando videos...");
-            
-            // Mostrar loader
-            loader.style.display = 'block';
-            
-            // Verificar que las URLs estén configuradas
-            if (videoData[0].videoUrl.includes("tu-usuario")) {
-                showConfigurationAlert();
-                loader.style.display = 'none';
-                return;
-            }
-            
-            // Generar orden aleatorio inicial
-            shuffleVideos();
-            
-            // Ocultar loader después de un breve tiempo
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 800);
-        }
-
-        // Mostrar alerta de configuración
-        function showConfigurationAlert() {
-            videosContainer.innerHTML = `
-                <div class="video-error">
-                    <h3>⚠️ Configuración Requerida</h3>
-                    <p>Debes configurar las URLs de tus videos e imágenes en GitHub.</p>
-                    <p>Reemplaza las URLs en el código JavaScript:</p>
-                    <p><code>https://raw.githubusercontent.com/tu-usuario/tu-repo/main/...</code></p>
-                    <p>por tus URLs reales de GitHub.</p>
-                    <button class="error-btn" onclick="location.reload()">Recargar después de configurar</button>
-                </div>
-            `;
-        }
-
-        // Mostrar error de video
-        function showVideoError(videoId) {
-            const videoCard = document.querySelector(`#video-${videoId}`);
-            if (videoCard) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'video-error';
-                errorDiv.innerHTML = `
-                    <h3>⚠️ Error cargando video</h3>
-                    <p>No se pudo cargar el video.</p>
-                    <p>Verifica que la URL sea correcta y que el archivo exista.</p>
-                    <button class="error-btn" onclick="retryVideo(${videoId})">Reintentar</button>
-                `;
-                videoCard.appendChild(errorDiv);
-            }
-        }
-
-        // Reintentar cargar video
-        function retryVideo(videoId) {
-            const videoCard = document.querySelector(`#video-${videoId}`);
-            if (videoCard) {
-                const errorDiv = videoCard.querySelector('.video-error');
-                if (errorDiv) errorDiv.remove();
-                
-                const videoElement = videoCard.querySelector('video');
-                if (videoElement) {
-                    videoElement.load();
-                    // Ahora el usuario ya interactuó, podemos reproducir con sonido
-                    videoElement.play().catch(e => {
-                        console.error("Error al reproducir video:", e);
-                        showVideoError(videoId);
-                    });
-                }
-            }
-        }
-
-        // Mezclar el orden de los videos
-        function shuffleVideos() {
-            // Crear un array con los índices de los videos
-            let indices = [0, 1, 2];
-            
-            // Mezclar el array usando el algoritmo de Fisher-Yates
-            for (let i = indices.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [indices[i], indices[j]] = [indices[j], indices[i]];
-            }
-            
-            // Actualizar el orden actual
-            currentVideoOrder = indices;
-            currentVideoIndex = 0;
-            
-            // Renderizar los videos en el nuevo orden
-            renderVideos();
-            
-            // Mostrar notificación de shuffle
-            showShuffleNotice();
-        }
-
-        // Iniciar temporizador para siguiente video
-        function startNextVideoTimer(videoElement, videoId) {
-            // Limpiar timer anterior si existe
-            if (skipTimer) {
-                clearTimeout(skipTimer);
-                skipTimer = null;
-            }
-            
-            // Mostrar temporizador
-            const timerElement = document.querySelector(`#video-${videoId} .next-video-timer`);
-            if (timerElement) {
-                timerElement.classList.add('show');
-                timerElement.textContent = "Siguiente en 1 segundo...";
-            }
-            
-            // Configurar timer para cambiar al siguiente video después de 1 segundo
-            skipTimer = setTimeout(() => {
-                goToNextVideo();
-            }, 1000);
-        }
-
-        // Ir al siguiente video
-        function goToNextVideo() {
-            // Limpiar timer
-            if (skipTimer) {
-                clearTimeout(skipTimer);
-                skipTimer = null;
-            }
-            
-            // Calcular siguiente índice
-            const nextIndex = (currentVideoIndex + 1) % 3;
-            
-            // Hacer scroll al siguiente video
-            videosContainer.scrollTo(0, nextIndex * window.innerHeight);
-        }
-
-        // Ir al video anterior
-        function goToPrevVideo() {
-            // Limpiar timer
-            if (skipTimer) {
-                clearTimeout(skipTimer);
-                skipTimer = null;
-            }
-            
-            // Calcular índice anterior
-            const prevIndex = currentVideoIndex === 0 ? 2 : currentVideoIndex - 1;
-            
-            // Hacer scroll al video anterior
-            videosContainer.scrollTo(0, prevIndex * window.innerHeight);
-        }
-
-        // Renderizar los videos en el contenedor
-        function renderVideos() {
-            // Limpiar el contenedor
+        // ============================================
+        // CARGAR UN VIDEO ESPECÍFICO
+        // ============================================
+        function loadVideo(index) {
+            // Limpiar contenedor
             videosContainer.innerHTML = '';
             
-            // Crear elementos de video en el orden actual
-            currentVideoOrder.forEach((videoIndex, index) => {
-                const video = videoData[videoIndex];
-                const isActive = index === currentVideoIndex;
-                
-                const videoCard = document.createElement('div');
-                videoCard.className = 'video-card';
-                videoCard.id = `video-${video.id}`;
-                
-                videoCard.innerHTML = `
-                    <div class="current-video">Video ${index + 1} de 3</div>
-                    <div class="next-video-timer"></div>
-                    <div class="skip-overlay">
-                        <div class="skip-text">Click para cancelar cambio automático<br><small>O espera 1 segundo para siguiente video</small></div>
-                    </div>
-                    <video ${isActive ? 'autoplay' : ''} ${isActive ? 'muted' : ''} loop playsinline preload="metadata">
+            // Actualizar contador
+            counter.textContent = `Video ${index + 1}/${videos.length}`;
+            
+            const video = videos[index];
+            
+            // Crear elemento de video
+            const videoHTML = `
+                <div class="video-player" id="videoPlayer">
+                    <video id="currentVideo" controls playsinline>
                         <source src="${video.videoUrl}" type="video/mp4">
-                        Tu navegador no soporta el elemento de video.
+                        Tu navegador no soporta videos.
                     </video>
-                    <div class="video-overlay ${isActive ? '' : 'show'}">
-                        <div class="overlay-text">Video pausado</div>
-                        <button class="overlay-btn play-btn">Reproducir</button>
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-author">
-                            <img src="${video.authorAvatar}" alt="${video.author}" class="author-avatar" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2220%22 y=%2222%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23fff%22 text-anchor=%22middle%22>${video.author.charAt(0)}</text></svg>'">
-                            <div class="author-name">${video.author}</div>
-                        </div>
-                        <div class="video-stats">
-                            <span>${video.likes} me gusta</span>
-                            <span>${video.comments} comentarios</span>
-                            <span>${video.shares} compartidos</span>
-                        </div>
-                    </div>
-                    <div class="video-actions">
-                        <button class="action-btn like-btn ${video.liked ? 'liked' : ''}" data-id="${video.id}">
-                            <i class="fas fa-heart"></i>
-                            <span class="action-count">${video.likes}</span>
-                        </button>
-                        <button class="action-btn comment-btn" data-id="${video.id}">
-                            <i class="fas fa-comment"></i>
-                            <span class="action-count">${video.comments}</span>
-                        </button>
-                        <button class="action-btn share-btn" data-id="${video.id}">
-                            <i class="fas fa-share"></i>
-                            <span class="action-count">${video.shares}</span>
-                        </button>
-                    </div>
-                `;
-                
-                videosContainer.appendChild(videoCard);
-                
-                // Configurar eventos para el video
-                const videoElement = videoCard.querySelector('video');
-                const overlay = videoCard.querySelector('.video-overlay');
-                const skipOverlay = videoCard.querySelector('.skip-overlay');
-                const playBtn = videoCard.querySelector('.play-btn');
-                const timerElement = videoCard.querySelector('.next-video-timer');
-                
-                // Manejar errores de carga de video
-                videoElement.addEventListener('error', (e) => {
-                    console.error(`Error cargando video ${video.id}:`, e);
-                    showVideoError(video.id);
-                });
-                
-                // Detectar cuando el video termina
-                videoElement.addEventListener('ended', () => {
-                    if (isActive && !userInteracted) {
-                        // Mostrar overlay para cancelar
-                        skipOverlay.classList.add('show');
-                        
-                        // Iniciar temporizador para siguiente video
-                        startNextVideoTimer(videoElement, video.id);
-                    }
-                });
-                
-                // Cancelar cambio automático si el usuario hace click
-                skipOverlay.addEventListener('click', () => {
-                    skipOverlay.classList.remove('show');
-                    if (timerElement) {
-                        timerElement.classList.remove('show');
-                    }
-                    if (skipTimer) {
-                        clearTimeout(skipTimer);
-                        skipTimer = null;
-                    }
-                    userInteracted = true;
                     
-                    // Reiniciar el video desde el principio
+                    <div class="controls">
+                        <div class="title">${video.title}</div>
+                        <div class="author">
+                            <div class="avatar"></div>
+                            <span>${video.author}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="action-btn">❤️<br><span class="action-count">1.2K</span></button>
+                        <button class="action-btn">💬<br><span class="action-count">345</span></button>
+                        <button class="action-btn">↪️<br><span class="action-count">89</span></button>
+                    </div>
+                </div>
+            `;
+            
+            videosContainer.innerHTML = videoHTML;
+            
+            // Obtener el elemento de video
+            const videoElement = document.getElementById('currentVideo');
+            
+            // Configurar eventos del video
+            setupVideoEvents(videoElement, index);
+            
+            // Reproducir automáticamente (el usuario ya interactuó)
+            videoElement.play().then(() => {
+                console.log(`Video ${index + 1} reproduciéndose`);
+            }).catch(error => {
+                console.log("Error al reproducir:", error);
+                // Si falla, mostrar controles
+                videoElement.controls = true;
+            });
+        }
+
+        // ============================================
+        // CONFIGURAR EVENTOS DEL VIDEO
+        // ============================================
+        function setupVideoEvents(videoElement, index) {
+            // Cuando el video termina
+            videoElement.addEventListener('ended', () => {
+                console.log(`Video ${index + 1} terminado`);
+                
+                // Mostrar temporizador
+                nextTimer.classList.add('show');
+                nextTimer.innerHTML = 'Siguiente video en 1s...<br><button class="skip-btn" id="cancelSkip">Cancelar</button>';
+                
+                // Configurar botón de cancelar
+                document.getElementById('cancelSkip').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    clearTimeout(timer);
+                    nextTimer.classList.remove('show');
+                    // Reiniciar el mismo video
                     videoElement.currentTime = 0;
                     videoElement.play();
-                    
-                    // Resetear userInteracted después de 5 segundos
-                    setTimeout(() => {
-                        userInteracted = false;
-                    }, 5000);
                 });
                 
-                if (isActive) {
-                    // Configurar eventos para el video activo
-                    videoElement.addEventListener('click', togglePlayPause);
-                    playBtn.addEventListener('click', () => {
-                        videoElement.play();
-                        overlay.classList.remove('show');
-                        videoElement.muted = false;
-                        userInteracted = true;
-                        
-                        // Resetear userInteracted después de 5 segundos
-                        setTimeout(() => {
-                            userInteracted = false;
-                        }, 5000);
-                    });
-                    
-                    videoElement.addEventListener('play', () => {
-                        overlay.classList.remove('show');
-                    });
-                    
-                    videoElement.addEventListener('pause', () => {
-                        overlay.classList.add('show');
-                    });
-                    
-                    // Ahora el usuario ya interactuó, podemos reproducir con sonido
-                    // Reproducir inmediatamente con sonido
-                    videoElement.muted = false;
-                    videoElement.play().then(() => {
-                        console.log(`Video ${video.id} reproduciéndose con sonido`);
-                    }).catch(e => {
-                        console.log("Error al reproducir, intentando con muted:", e);
-                        // Si falla, intentar con muted
-                        videoElement.muted = true;
-                        videoElement.play();
-                    });
+                // Temporizador para siguiente video
+                timer = setTimeout(() => {
+                    nextVideo();
+                }, 1000);
+            });
+            
+            // Cuando el usuario hace clic en el video (pausar/reproducir)
+            videoElement.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (videoElement.paused) {
+                    videoElement.play();
                 } else {
-                    // Para videos no activos, pausarlos
                     videoElement.pause();
                 }
             });
             
-            // Configurar eventos para los botones de acción
-            setupActionButtons();
-            
-            // Configurar scroll para cambiar de video
-            setupScrollBehavior();
+            // Si hay error al cargar el video
+            videoElement.addEventListener('error', () => {
+                console.error(`Error cargando video ${index + 1}`);
+                // Intentar con el siguiente video
+                setTimeout(() => nextVideo(), 2000);
+            });
         }
 
-        // Alternar entre play y pause
-        function togglePlayPause(e) {
-            const video = e.target;
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-            userInteracted = true;
+        // ============================================
+        // PASAR AL SIGUIENTE VIDEO
+        // ============================================
+        function nextVideo() {
+            // Limpiar temporizador
+            clearTimeout(timer);
+            nextTimer.classList.remove('show');
             
-            // Resetear userInteracted después de 5 segundos
-            setTimeout(() => {
-                userInteracted = false;
-            }, 5000);
+            // Calcular siguiente índice
+            currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+            
+            // Cargar siguiente video
+            loadVideo(currentVideoIndex);
         }
 
-        // Configurar botones de acción (like, comentar, compartir)
-        function setupActionButtons() {
-            // Botones de like
-            document.querySelectorAll('.like-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const videoId = parseInt(this.getAttribute('data-id'));
-                    const videoIndex = videoData.findIndex(v => v.id === videoId);
+        // ============================================
+        // PASAR AL VIDEO ANTERIOR
+        // ============================================
+        function prevVideo() {
+            // Limpiar temporizador
+            clearTimeout(timer);
+            nextTimer.classList.remove('show');
+            
+            // Calcular índice anterior
+            currentVideoIndex = currentVideoIndex === 0 ? videos.length - 1 : currentVideoIndex - 1;
+            
+            // Cargar video anterior
+            loadVideo(currentVideoIndex);
+        }
+
+        // ============================================
+        // NAVEGACIÓN CON TECLADO
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (!userStarted) return;
+            
+            switch(e.code) {
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextVideo();
+                    break;
                     
-                    if (videoIndex !== -1) {
-                        videoData[videoIndex].liked = !videoData[videoIndex].liked;
-                        
-                        // Actualizar contador visualmente
-                        const likeCount = this.querySelector('.action-count');
-                        let currentLikes = parseInt(videoData[videoIndex].likes);
-                        
-                        if (videoData[videoIndex].liked) {
-                            this.classList.add('liked');
-                            videoData[videoIndex].likes = (currentLikes + 1) + 'K';
-                            likeCount.textContent = videoData[videoIndex].likes;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevVideo();
+                    break;
+                    
+                case 'Space':
+                    e.preventDefault();
+                    const videoElement = document.getElementById('currentVideo');
+                    if (videoElement) {
+                        if (videoElement.paused) {
+                            videoElement.play();
                         } else {
-                            this.classList.remove('liked');
-                            videoData[videoIndex].likes = (currentLikes - 1) + 'K';
-                            likeCount.textContent = videoData[videoIndex].likes;
+                            videoElement.pause();
                         }
                     }
-                });
-            });
+                    break;
+                    
+                case 'KeyR':
+                    e.preventDefault();
+                    // Mezclar videos
+                    shuffleVideos();
+                    break;
+            }
+        });
+
+        // ============================================
+        // MEZCLAR VIDEOS
+        // ============================================
+        function shuffleVideos() {
+            // Algoritmo simple para mezclar
+            for (let i = videos.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [videos[i], videos[j]] = [videos[j], videos[i]];
+            }
             
-            // Botones de comentar (simulación)
-            document.querySelectorAll('.comment-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const videoId = parseInt(this.getAttribute('data-id'));
-                    alert(`Función de comentarios para el video ${videoId} (simulación)`);
-                });
-            });
+            // Volver al primer video
+            currentVideoIndex = 0;
+            loadVideo(currentVideoIndex);
             
-            // Botones de compartir (simulación)
-            document.querySelectorAll('.share-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const videoId = parseInt(this.getAttribute('data-id'));
-                    alert(`Compartir video ${videoId} (simulación)`);
-                });
-            });
+            // Mostrar notificación
+            showNotification("Videos mezclados");
         }
 
-        // Configurar comportamiento de scroll
-        function setupScrollBehavior() {
-            let isScrolling = false;
+        // ============================================
+        // MOSTRAR NOTIFICACIÓN TEMPORAL
+        // ============================================
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(255,255,255,0.2);
+                backdrop-filter: blur(10px);
+                padding: 10px 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                animation: fadeInOut 2s;
+            `;
+            notification.textContent = message;
             
-            videosContainer.addEventListener('scroll', () => {
-                if (!isScrolling) {
-                    isScrolling = true;
-                    
-                    // Calcular qué video está visible
-                    const scrollPosition = videosContainer.scrollTop;
-                    const windowHeight = window.innerHeight;
-                    const videoIndex = Math.round(scrollPosition / windowHeight);
-                    
-                    if (videoIndex !== currentVideoIndex && videoIndex >= 0 && videoIndex < 3) {
-                        // Limpiar timer si existe
-                        if (skipTimer) {
-                            clearTimeout(skipTimer);
-                            skipTimer = null;
-                        }
-                        
-                        // Ocultar overlays del video anterior
-                        const prevVideoCard = document.querySelector(`#video-${videoData[currentVideoOrder[currentVideoIndex]].id}`);
-                        if (prevVideoCard) {
-                            const prevVideo = prevVideoCard.querySelector('video');
-                            const prevSkipOverlay = prevVideoCard.querySelector('.skip-overlay');
-                            const prevTimer = prevVideoCard.querySelector('.next-video-timer');
-                            
-                            prevVideo.pause();
-                            if (prevSkipOverlay) prevSkipOverlay.classList.remove('show');
-                            if (prevTimer) prevTimer.classList.remove('show');
-                        }
-                        
-                        // Actualizar índice actual
-                        currentVideoIndex = videoIndex;
-                        userInteracted = false; // Resetear interacción del usuario
-                        
-                        // Reproducir el nuevo video activo
-                        const currentVideoCard = document.querySelector(`#video-${videoData[currentVideoOrder[currentVideoIndex]].id}`);
-                        if (currentVideoCard) {
-                            const currentVideo = currentVideoCard.querySelector('video');
-                            const overlay = currentVideoCard.querySelector('.video-overlay');
-                            
-                            // Quitar overlay y reproducir
-                            overlay.classList.remove('show');
-                            currentVideo.muted = false;
-                            
-                            // Intentar reproducir
-                            currentVideo.play().catch(e => {
-                                console.log("Error al reproducir:", e);
-                            });
-                        }
-                    }
-                    
-                    // Permitir nuevo scroll después de un tiempo
-                    setTimeout(() => {
-                        isScrolling = false;
-                    }, 300);
-                }
-            });
-        }
-
-        // Mostrar notificación de shuffle
-        function showShuffleNotice() {
-            shuffleNotice.classList.add('show');
+            document.body.appendChild(notification);
             
             setTimeout(() => {
-                shuffleNotice.classList.remove('show');
+                notification.remove();
             }, 2000);
         }
 
-        // Event Listeners
-        shuffleBtn.addEventListener('click', shuffleVideos);
+        // ============================================
+        // INICIAR LA APLICACIÓN CUANDO SE CARGA LA PÁGINA
+        // ============================================
+        document.addEventListener('DOMContentLoaded', initApp);
 
-        // Inicializar la página cuando se carga
-        document.addEventListener('DOMContentLoaded', initPage);
-
-        // Manejar la tecla Espacio para pausar/reproducir
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                const currentVideoCard = document.querySelector(`#video-${videoData[currentVideoOrder[currentVideoIndex]].id}`);
-                if (currentVideoCard) {
-                    const video = currentVideoCard.querySelector('video');
-                    togglePlayPause({target: video});
-                }
+        // ============================================
+        // ESTILO PARA LA ANIMACIÓN DE NOTIFICACIÓN
+        // ============================================
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             }
-            
-            // Tecla R para aleatorizar
-            if (e.code === 'KeyR') {
-                shuffleVideos();
-            }
-            
-            // Tecla flecha derecha para siguiente video
-            if (e.code === 'ArrowRight') {
-                e.preventDefault();
-                goToNextVideo();
-            }
-            
-            // Tecla flecha izquierda para video anterior
-            if (e.code === 'ArrowLeft') {
-                e.preventDefault();
-                goToPrevVideo();
-            }
-        });
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
