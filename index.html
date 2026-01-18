@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VideoShorts - Videos Aleatorios</title>
+    <title>VideoShorts - Videos desde GitHub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -280,6 +280,29 @@
             z-index: 5;
         }
         
+        .video-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: rgba(255, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            z-index: 6;
+        }
+        
+        .error-btn {
+            background-color: #FF0050;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        
         @media (max-width: 500px) {
             .container {
                 max-width: 100%;
@@ -317,40 +340,53 @@
     </div>
 
     <script>
-        // Datos de los videos (pueden ser reemplazados por videos reales)
+        // ============================================
+        // CONFIGURACIÓN: REEMPLAZA ESTAS URLs
+        // ============================================
+        // Cambia estas URLs por las de tus videos e imágenes en GitHub
+        // Formato: https://raw.githubusercontent.com/USUARIO/REPOSITORIO/main/ruta/archivo.mp4
+        // ============================================
+        
+        // Datos de los videos (REEMPLAZA con tus URLs de GitHub)
         const videoData = [
             {
                 id: 1,
-                title: "Increíbles acrobacias en bicicleta",
-                author: "Alex Rider",
-                authorAvatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                title: "Video de GitHub 1",
+                author: "Tu Usuario",
+                // Reemplaza con la URL de tu imagen en GitHub
+                authorAvatar: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/images/avatar1.jpg",
                 likes: "125K",
                 comments: "2.3K",
                 shares: "5K",
                 liked: false,
-                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-man-doing-acrobatics-on-a-bike-34555-large.mp4"
+                // Reemplaza con la URL de tu video en GitHub
+                videoUrl: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/videos/video1.mp4"
             },
             {
                 id: 2,
-                title: "Paisajes naturales relajantes con música",
-                author: "Nature Lover",
-                authorAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
+                title: "Video de GitHub 2",
+                author: "Tu Usuario",
+                // Reemplaza con la URL de tu imagen en GitHub
+                authorAvatar: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/images/avatar2.jpg",
                 likes: "89K",
                 comments: "1.5K",
                 shares: "3.2K",
                 liked: true,
-                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-countryside-meadow-4075-large.mp4"
+                // Reemplaza con la URL de tu video en GitHub
+                videoUrl: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/videos/video2.mp4"
             },
             {
                 id: 3,
-                title: "Tutorial de baile urbano paso a paso",
-                author: "Dance Masters",
-                authorAvatar: "https://randomuser.me/api/portraits/men/67.jpg",
+                title: "Video de GitHub 3",
+                author: "Tu Usuario",
+                // Reemplaza con la URL de tu imagen en GitHub
+                authorAvatar: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/images/avatar3.jpg",
                 likes: "210K",
                 comments: "4.7K",
                 shares: "12K",
                 liked: false,
-                videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-group-of-friends-dancing-4137-large.mp4"
+                // Reemplaza con la URL de tu video en GitHub
+                videoUrl: "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/assets/videos/video3.mp4"
             }
         ];
 
@@ -369,6 +405,13 @@
             // Mostrar loader
             loader.style.display = 'block';
             
+            // Verificar que las URLs estén configuradas
+            if (videoData[0].videoUrl.includes("tu-usuario")) {
+                showConfigurationAlert();
+                loader.style.display = 'none';
+                return;
+            }
+            
             // Generar orden aleatorio inicial
             shuffleVideos();
             
@@ -376,6 +419,54 @@
             setTimeout(() => {
                 loader.style.display = 'none';
             }, 800);
+        }
+
+        // Mostrar alerta de configuración
+        function showConfigurationAlert() {
+            videosContainer.innerHTML = `
+                <div class="video-error">
+                    <h3>⚠️ Configuración Requerida</h3>
+                    <p>Debes configurar las URLs de tus videos e imágenes en GitHub.</p>
+                    <p>Reemplaza las URLs en el código JavaScript (líneas 203-230):</p>
+                    <p><code>https://raw.githubusercontent.com/tu-usuario/tu-repo/main/...</code></p>
+                    <p>por tus URLs reales de GitHub.</p>
+                    <button class="error-btn" onclick="location.reload()">Recargar después de configurar</button>
+                </div>
+            `;
+        }
+
+        // Mostrar error de video
+        function showVideoError(videoId) {
+            const videoCard = document.querySelector(`#video-${videoId}`);
+            if (videoCard) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'video-error';
+                errorDiv.innerHTML = `
+                    <h3>⚠️ Error cargando video</h3>
+                    <p>No se pudo cargar el video desde GitHub.</p>
+                    <p>Verifica que la URL sea correcta y que el archivo exista.</p>
+                    <button class="error-btn" onclick="retryVideo(${videoId})">Reintentar</button>
+                `;
+                videoCard.appendChild(errorDiv);
+            }
+        }
+
+        // Reintentar cargar video
+        function retryVideo(videoId) {
+            const videoCard = document.querySelector(`#video-${videoId}`);
+            if (videoCard) {
+                const errorDiv = videoCard.querySelector('.video-error');
+                if (errorDiv) errorDiv.remove();
+                
+                const videoElement = videoCard.querySelector('video');
+                if (videoElement) {
+                    videoElement.load();
+                    videoElement.play().catch(e => {
+                        console.error("Error al reproducir video:", e);
+                        showVideoError(videoId);
+                    });
+                }
+            }
         }
 
         // Mezclar el orden de los videos
@@ -416,7 +507,7 @@
                 
                 videoCard.innerHTML = `
                     <div class="current-video">Video ${index + 1} de 3</div>
-                    <video ${isActive ? 'autoplay' : ''} ${isActive ? 'muted' : ''} loop playsinline>
+                    <video ${isActive ? 'autoplay' : ''} ${isActive ? 'muted' : ''} loop playsinline preload="metadata">
                         <source src="${video.videoUrl}" type="video/mp4">
                         Tu navegador no soporta el elemento de video.
                     </video>
@@ -427,7 +518,7 @@
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
                         <div class="video-author">
-                            <img src="${video.authorAvatar}" alt="${video.author}" class="author-avatar">
+                            <img src="${video.authorAvatar}" alt="${video.author}" class="author-avatar" onerror="this.src='https://via.placeholder.com/40'">
                             <div class="author-name">${video.author}</div>
                         </div>
                         <div class="video-stats">
@@ -458,6 +549,12 @@
                 const videoElement = videoCard.querySelector('video');
                 const overlay = videoCard.querySelector('.video-overlay');
                 const playBtn = videoCard.querySelector('.play-btn');
+                
+                // Manejar errores de carga de video
+                videoElement.addEventListener('error', (e) => {
+                    console.error(`Error cargando video ${video.id}:`, e);
+                    showVideoError(video.id);
+                });
                 
                 if (isActive) {
                     // Configurar eventos para el video activo
